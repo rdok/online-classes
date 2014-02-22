@@ -16,6 +16,12 @@ import me.dokollari.course.manager.models.Instructor;
 
 
 public class DB {
+    public static String SELECT_STUDENTS = "SELECT * FROM collegedb.students;";
+    public static String SELECT_INSTRUCTORS = "SELECT * FROM collegedb.instructors ORDER BY last_name ASC;";
+    public static final String ID = "id";
+    public static final String LAST_NAME = "last_name";
+    public static final String FIRST_NAME = "first_name";
+
     // domain: db4free, port 3306
     // db_name: a1830231hosp
     private static final String _DB_CONNECTION = "jdbc:mysql://db4free.net:3306/collegedb";
@@ -95,7 +101,7 @@ public class DB {
         connection = getDBConnection();
 
         Statement statement_insertStudents = connection.createStatement();
-        ResultSet resultSet = statement_insertStudents.executeQuery(DB_queries.SELECT_STUDENTS);
+        ResultSet resultSet = statement_insertStudents.executeQuery(DB.SELECT_STUDENTS);
 
         jL_message.setText("Retrieved Student Data");
         return resultSet;
@@ -117,4 +123,35 @@ public class DB {
 
         jL_message.setText("Instructor added to database.");
     }
+
+    /**
+     *
+     * @param jL_message update this label to inform the user on internal operations.
+     * @return set of students
+     * @throws SQLException
+     */
+    public static ResultSet getInstructors(JLabel jL_message) throws SQLException {
+        jL_message.setText("Retrieving Instructors Data");
+
+        Connection connection;
+        connection = getDBConnection();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(DB.SELECT_INSTRUCTORS);
+
+        jL_message.setText("Retrieved Instructors Data");
+        return resultSet;
+    }
+
+    public static void removeInstructor(String id, JLabel jL_message) throws SQLException {
+        jL_message.setText("Delteing instructor data");
+
+        String query = "DELETE FROM `collegedb`.`instructors` WHERE `id`='" + id + "';";
+
+        Connection connection = getDBConnection();
+        Statement statement = connection.createStatement();
+        statement.executeUpdate(query);
+        // ResultSet resultSet = statement.executeQuery(query);
+
+        jL_message.setText("Instructor deleted from database.");
+    } // end method removeInstructor
 }

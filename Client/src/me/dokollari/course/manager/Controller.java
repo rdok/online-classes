@@ -6,6 +6,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +16,7 @@ import javax.imageio.ImageIO;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
 
 import me.dokollari.course.manager.models.Instructor;
 
@@ -47,5 +51,28 @@ public class Controller {
     public void addInstructor(String lastName, String firstName, JLabel jL_message) throws Exception {
         Instructor instructor = new Instructor(lastName, firstName);
         DB.insertInstructor(instructor, jL_message);
+    }
+
+    public static String getInstructors(JLabel jL_message) throws SQLException, Exception {
+        ResultSet resultSet = DB.getInstructors(jL_message);
+
+        List<Instructor> instructors = new ArrayList<Instructor>();
+        Instructor instructor;
+
+        while (resultSet.next()) {
+            int id = resultSet.getInt(DB.ID);
+            String firstName = resultSet.getString(DB.FIRST_NAME);
+            String lastName = resultSet.getString(DB.LAST_NAME);
+            instructor = new Instructor(lastName, firstName, id);
+
+            instructors.add(instructor);
+        }
+        String output = Viewer.format(instructors);
+
+        return output;
+    }
+
+    public void removeInstructor(JTextField jTF_instructorsID, JLabel jL_dbMessages) throws SQLException {
+            DB.removeInstructor(jTF_instructorsID.getText(), jL_dbMessages);
     }
 } // end method setJLabelImage

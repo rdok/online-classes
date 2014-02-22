@@ -1,11 +1,15 @@
 
 package me.dokollari.course.manager.swings;
 
+import java.awt.Font;
 import java.awt.Frame;
+
+import java.sql.SQLException;
 
 import javax.swing.JTextField;
 
 import me.dokollari.course.manager.Controller;
+import me.dokollari.course.manager.DB;
 import me.dokollari.course.manager.Verify;
 
 
@@ -19,6 +23,7 @@ public class JD_EditInstructors extends javax.swing.JDialog {
     private final String LAST_NAME_REQ = "Last Name (required)";
     private final String PHONE = "Phone";
     private final String EMAIL = "Email";
+    private final String ID = "Enter Instructor's ID";
 
     /** Creates new form JD_EditInstructors */
     public JD_EditInstructors(java.awt.Frame parent, boolean modal, Controller controller) {
@@ -44,12 +49,15 @@ public class JD_EditInstructors extends javax.swing.JDialog {
         jTextField4 = new javax.swing.JTextField();
         jB_register = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
+        jTA_dbMessages = new javax.swing.JTextArea();
         jB_back = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
-        jComboBox1 = new javax.swing.JComboBox();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        jCB_sort = new javax.swing.JComboBox();
+        jCBreversSort = new javax.swing.JCheckBox();
         jProgressBar1 = new javax.swing.JProgressBar();
         jPanel3 = new javax.swing.JPanel();
+        jTF_instructorsID = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
         jL_dbMessages = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -100,16 +108,18 @@ public class JD_EditInstructors extends javax.swing.JDialog {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTF_firstName)
-                    .addComponent(jTF_lastName)
-                    .addComponent(jTextField3)
-                    .addComponent(jTextField4))
-                .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addGap(0, 149, Short.MAX_VALUE)
-                .addComponent(jB_register)
-                .addGap(34, 34, 34))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addComponent(jB_register)
+                        .addGap(34, 34, 34))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jTextField4, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextField3, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTF_lastName, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTF_firstName, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap())))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -129,6 +139,11 @@ public class JD_EditInstructors extends javax.swing.JDialog {
 
         jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Instructors on database"));
 
+        jTA_dbMessages.setColumns(20);
+        jTA_dbMessages.setRows(5);
+        jTA_dbMessages.setFont(new Font("Courier New", Font.PLAIN, 12));
+        jScrollPane1.setViewportView(jTA_dbMessages);
+
         jB_back.setText("Back");
         jB_back.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -138,9 +153,19 @@ public class JD_EditInstructors extends javax.swing.JDialog {
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Sort by"));
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Last Name", "ID", "Name" }));
+        jCB_sort.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Last Name", "ID", "First Name" }));
+        jCB_sort.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCB_sortActionPerformed(evt);
+            }
+        });
 
-        jCheckBox1.setText("Reversed");
+        jCBreversSort.setText("Reversed");
+        jCBreversSort.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCBreversSortActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -148,32 +173,61 @@ public class JD_EditInstructors extends javax.swing.JDialog {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jCB_sort, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jCheckBox1)
+                .addComponent(jCBreversSort)
                 .addContainerGap(21, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jCheckBox1))
+                    .addComponent(jCB_sort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jCBreversSort))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel3.setBackground(new java.awt.Color(255, 153, 51));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Remove Instructor"));
         jPanel3.setPreferredSize(new java.awt.Dimension(267, 223));
+
+        jTF_instructorsID.setText(ID);
+        jTF_instructorsID.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jTF_instructorsIDFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jTF_instructorsIDFocusLost(evt);
+            }
+        });
+
+        jButton1.setBackground(new java.awt.Color(255, 0, 0));
+        jButton1.setText("Remove");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 267, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jButton1)
+                    .addComponent(jTF_instructorsID, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 223, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(42, 42, 42)
+                .addComponent(jTF_instructorsID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(44, 44, 44)
+                .addComponent(jButton1)
+                .addContainerGap(76, Short.MAX_VALUE))
         );
 
         jL_dbMessages.setText("System:");
@@ -187,11 +241,15 @@ public class JD_EditInstructors extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(25, 25, 25)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 288, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(0, 30, Short.MAX_VALUE)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 393, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(80, 80, 80)))
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jB_back)
@@ -208,11 +266,11 @@ public class JD_EditInstructors extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(26, 26, 26)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jB_back)
@@ -238,10 +296,9 @@ public class JD_EditInstructors extends javax.swing.JDialog {
             controller.addInstructor(lastName, firstName, jL_dbMessages);
             reset_jTF_firstName();
             reset_jTF_lasttName();
+            fetchInstructorsData();
         } catch (Exception e) {
-            jL_dbMessages.setText("System: Error Occurred. Hover for details.");
-            jL_dbMessages.setForeground(new java.awt.Color(255, 0, 0)); // red/error
-            jL_dbMessages.setToolTipText(e.getMessage());
+            showErrorMessage(e);
         }        
     }//GEN-LAST:event_jB_registerActionPerformed
 
@@ -267,23 +324,55 @@ public class JD_EditInstructors extends javax.swing.JDialog {
         String text = jTF_lastName.getText();
 
         if (text.equals("")) {
-          reset_jTF_lasttName();
+            reset_jTF_lasttName();
         } else {
             resetTextFieldLoseFocus(jTF_lastName);
         } // end else
     }//GEN-LAST:event_jTF_lastNameFocusLost
 
+    private void jTF_instructorsIDFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTF_instructorsIDFocusGained
+        resetTextFieldGainFocus(jTF_instructorsID);
+    }//GEN-LAST:event_jTF_instructorsIDFocusGained
+
+    private void jTF_instructorsIDFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTF_instructorsIDFocusLost
+        resetTextFieldLoseFocus(jTF_instructorsID);
+    }//GEN-LAST:event_jTF_instructorsIDFocusLost
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        try {
+            controller.removeInstructor(jTF_instructorsID, jL_dbMessages);
+            fetchInstructorsData();
+        } catch (SQLException e) {
+            jL_dbMessages.setText(e.getMessage());
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jCB_sortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCB_sortActionPerformed
+       
+        //JComboBox jCB_sort = (JComboBox) evt.getSource();
+        updateListingInstructtors();
+        //updateLabel(petName);
+    }//GEN-LAST:event_jCB_sortActionPerformed
+
+    private void jCBreversSortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBreversSortActionPerformed
+        updateListingInstructtors();
+    }//GEN-LAST:event_jCBreversSortActionPerformed
+
     private void initFinalCompon(Frame parent) {
         jB_back.requestFocus(); // request focus to this button.
         this.setLocationRelativeTo(parent);
+        fetchInstructorsData();
+
         this.setVisible(true);
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jB_back;
     private javax.swing.JButton jB_register;
-    private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JComboBox jComboBox1;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JComboBox jCB_sort;
+    private javax.swing.JCheckBox jCBreversSort;
     private javax.swing.JLabel jL_dbMessages;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -291,7 +380,9 @@ public class JD_EditInstructors extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea jTA_dbMessages;
     private javax.swing.JTextField jTF_firstName;
+    private javax.swing.JTextField jTF_instructorsID;
     private javax.swing.JTextField jTF_lastName;
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
@@ -304,11 +395,12 @@ public class JD_EditInstructors extends javax.swing.JDialog {
      */
     private void resetTextFieldGainFocus(JTextField jTF_field) {
         if (jTF_field.getText().equals(FIRST_NAME_REQ) || jTF_field.getText().equals(LAST_NAME_REQ) ||
-            jTF_field.getText().equals(Verify.NAME_REQ)) {
+            jTF_field.getText().equals(Verify.NAME_REQ) || jTF_field.getText().equals(ID) ||
+            jTF_field.getText().equals(Verify.ID_REQ)) {
             jTF_field.setText("");
-        }
+        } // end if
         jTF_field.setForeground(new java.awt.Color(51, 51, 51)); // grey/default
-    }
+    } // end method resetTextFieldGainFocus
 
     /**
      * when given jtextfield loses focus checks if given variable is proper (alphabetical 1-45 lentth)
@@ -318,21 +410,78 @@ public class JD_EditInstructors extends javax.swing.JDialog {
         String name = jTF_field.getText();
 
         try {
-            Verify.checkName(name);
+            if (jTF_field.equals(jTF_firstName) || jTF_field.equals(jTF_lastName)) {
+                Verify.checkName(name);
+            } else if (jTF_field.equals(jTF_instructorsID)) {
+                Verify.checkID(name);
+            } // end else if
+
+
             jTF_field.setForeground(new java.awt.Color(0, 153, 51)); // green/correct
+            jTF_field.setBackground(new java.awt.Color(153, 255, 153));
+
         } catch (Exception e) {
             jTF_field.setText(e.getMessage());
             jTF_field.setForeground(new java.awt.Color(255, 0, 0)); // red/error
-        }
-    }
+        } // end ttry
+    } // end method resetTextFieldLoseFocus
 
     private void reset_jTF_firstName() {
         jTF_firstName.setText(FIRST_NAME_REQ);
+        jTF_firstName.setBackground(new java.awt.Color(255, 255, 255));
         jTF_firstName.setForeground(new java.awt.Color(204, 204, 204)); // grey/default
-    }
-    
+    } // end method reset_jTF_firstName
+
     private void reset_jTF_lasttName() {
         jTF_lastName.setText(LAST_NAME_REQ);
+        jTF_lastName.setBackground(new java.awt.Color(255, 255, 255));
         jTF_lastName.setForeground(new java.awt.Color(204, 204, 204)); // grey/default
+    } // end method reset_jTF_lasttName
+
+    private void showErrorMessage(Exception e) {
+        jL_dbMessages.setText("System: Error Occurred. Hover for details.");
+        jL_dbMessages.setForeground(new java.awt.Color(255, 0, 0)); // red/error
+        jL_dbMessages.setToolTipText(e.getMessage());
+    } // end method showErrorMessage
+
+    private void fetchInstructorsData() {
+        try {
+            String message = controller.getInstructors(jL_dbMessages);
+            jTA_dbMessages.setText(message);
+        } catch (SQLException e) {
+            showErrorMessage(e);
+        } catch (Exception e) {
+            showErrorMessage(e);
+        } // end catch
+    }
+
+    private void updateListingInstructtors() {
+        String sortType = (String) jCB_sort.getSelectedItem();
+
+        switch (sortType) {
+        case "Last Name":
+            if (!jCBreversSort.isSelected()) {
+                DB.SELECT_INSTRUCTORS = "SELECT * FROM collegedb.instructors ORDER BY last_name;";
+            } else {
+                DB.SELECT_INSTRUCTORS = "SELECT * FROM collegedb.instructors ORDER BY last_name DESC;";
+            }
+            break;
+        case "ID":
+            if (!jCBreversSort.isSelected()) {
+                DB.SELECT_INSTRUCTORS = "SELECT * FROM collegedb.instructors ORDER BY id;";
+            } else {
+                DB.SELECT_INSTRUCTORS = "SELECT * FROM collegedb.instructors ORDER BY id DESC;";
+            }
+            break;
+        case "First Name":
+            if (!jCBreversSort.isSelected()) {
+                DB.SELECT_INSTRUCTORS = "SELECT * FROM collegedb.instructors ORDER BY first_name;";
+            } else {
+                DB.SELECT_INSTRUCTORS = "SELECT * FROM collegedb.instructors ORDER BY first_name DESC;";
+            }
+            break;
+        }
+
+        fetchInstructorsData();
     }
 }

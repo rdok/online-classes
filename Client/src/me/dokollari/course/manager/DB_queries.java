@@ -3,11 +3,7 @@ package me.dokollari.course.manager;
 
 public class DB_queries {
 
-    public static final String SELECT_STUDENTS = "SELECT * FROM collegedb.students;";
-    public static final String STUDENT_ID = "id";
-    public static final String STUDENT_LAST_NAME = "last_name";
-    public static final String STUDENT_FIRST_NAME = "first_name";
-
+  
     public final String INSERT_CLASS =
         "INSERT INTO `collegedb`.`classes` (`name`, `courses_id`, `instructors_id`, `max_students`) VALUES ('102', '1', '1', '14');";
     public final String INSERT_COURSE =
@@ -27,4 +23,5 @@ public class DB_queries {
         "INSERT INTO `collegedb`.`students_classes` (`students_id`, `classes_id`) VALUES ('1', '1');";
     public final String INSERT_STUDENT_COURSE =
         "INSERT INTO `collegedb`.`students_courses` (`students_id`, `courses_id`) VALUES ('1', '1');";
+    public final String DELETE_INSTRUCTOR = "DELETE FROM `collegedb`.`instructors` WHERE `id`='4';";
 }
