@@ -13,6 +13,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.sql.SQLException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -31,6 +32,8 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.TitledBorder;
 
+import me.dokollari.cmanager.manager.DB;
+
 /**
  * 
  * @author Riz
@@ -39,6 +42,10 @@ import javax.swing.border.TitledBorder;
 public class MainFrame
 {
 
+	private static final Color FONT_COLOR_DEFAULT = new Color(51, 51, 51);
+	private static final Color BACKGROUND_COLOR_DEFAULT = new Color(255, 255,
+			255);
+	private static final Color BACKGROUND_COLOR_ERROR = new Color(216, 0, 0);
 	private static final String LOG_IN_MESSAGE_JLABEL = "Log In";
 	private static final String USER_NAME_MESSAGE = "Username";
 	private static final String PASSWORD_MESSAGE = "Password";
@@ -46,6 +53,7 @@ public class MainFrame
 	private JTextField txtUsername;
 	private JPasswordField passwordField;
 	private DB db;
+	private JLabel lblConnectionMessage;
 
 	/**
 	 * Launch the application.
@@ -69,7 +77,6 @@ public class MainFrame
 	 */
 	public MainFrame() {
 		initialize(); // initialize UI
-		db = new DB(); // initialize database.
 	} // end constructor
 
 	/**
@@ -87,7 +94,7 @@ public class MainFrame
 				screenSize.height / 2 - frame.getSize().height / 2);
 
 		final JPanel panelBackgroundBack = new JPanel();
-		panelBackgroundBack.setForeground(new Color(51, 51, 51));
+		panelBackgroundBack.setForeground(FONT_COLOR_DEFAULT);
 		panelBackgroundBack.addComponentListener(new ComponentAdapter()
 		{
 			@Override
@@ -102,16 +109,10 @@ public class MainFrame
 				firstComponent.setLocation(
 						(int) (panelBackgroundBack.getWidth() / 2 - firstComponent
 								.getSize().getWidth() / 2),
-						(int) (panelBackgroundBack.getHeight() / 2
-								- firstComponent.getSize().getHeight() / 2));
-				// for (int i = 0; i < panelBackground.getComponentCount() - 1; i++)
-				// {
-				// Component component = panelBackground.getComponent(i);
-				// component.setLocation(
-				// (int) (panelBackground.getWidth() / 2 - component
-				// .getSize().getWidth() / 2), component.getY());
-				// } // end for
-			} // end method componentResized
+						(int) (panelBackgroundBack.getHeight() / 2 - firstComponent
+								.getSize().getHeight() / 2));
+
+			}
 		});
 		frame.getContentPane().add(panelBackgroundBack);
 		panelBackgroundBack.setLayout(null);
@@ -119,12 +120,6 @@ public class MainFrame
 		JPanel panelBackgroundFront = new JPanel();
 		panelBackgroundFront.setBounds(222, 62, 314, 277);
 		panelBackgroundBack.add(panelBackgroundFront);
-
-		JLabel lblBackgroundFront = new JLabel("Front Background");
-		lblBackgroundFront.setHorizontalAlignment(SwingConstants.CENTER);
-		lblBackgroundFront.setBounds(0, 0, 314, 277);
-		lblBackgroundFront.setIcon(new ImageIcon(MainFrame.class
-				.getResource("/img/background_small.png")));
 
 		txtUsername = new JTextField();
 		txtUsername.setBounds(34, 72, 250, 35);
@@ -137,11 +132,21 @@ public class MainFrame
 			public void focusGained(FocusEvent e) {
 				String userName = txtUsername.getText();
 
+				// reset color for user name
+				txtUsername.setBorder(new MatteBorder(0, 5, 0, 0,
+						(Color) BACKGROUND_COLOR_DEFAULT));
+				txtUsername.setBackground(BACKGROUND_COLOR_DEFAULT);
+
+				// clear connection message
+				lblConnectionMessage.setText("");
+
+				// empties user indication
 				if (userName.equals(USER_NAME_MESSAGE)) {
 					txtUsername.setBorder(new MatteBorder(0, 5, 0, 0,
-							(Color) new Color(102, 204, 255)));
+							(Color) BACKGROUND_COLOR_DEFAULT));
+					txtUsername.setBackground(BACKGROUND_COLOR_DEFAULT);
 					txtUsername.setFont(new Font("Rockwell", Font.PLAIN, 13));
-					txtUsername.setForeground(new Color(51, 51, 51));
+					txtUsername.setForeground(FONT_COLOR_DEFAULT);
 					txtUsername.setText("");
 				} // end if
 			} // end method focusGainec
@@ -150,6 +155,7 @@ public class MainFrame
 			public void focusLost(FocusEvent arg0) {
 				String userName = txtUsername.getText();
 
+				// show input indication for user name
 				if (userName.equals("")) {
 					txtUsername.setBorder(new LineBorder(null));
 					txtUsername.setText(USER_NAME_MESSAGE);
@@ -164,9 +170,9 @@ public class MainFrame
 		txtUsername.setColumns(10);
 
 		final JLabel lblLogin = new JLabel(LOG_IN_MESSAGE_JLABEL);
-		lblLogin.setBounds(34, 43, 250, 18);
+		lblLogin.setBounds(34, 43, 46, 18);
 		lblLogin.setFont(new Font("Open Sans", Font.BOLD, 13));
-		lblLogin.setForeground(new Color(51, 51, 51));
+		lblLogin.setForeground(FONT_COLOR_DEFAULT);
 
 		passwordField = new JPasswordField();
 		passwordField.setBounds(34, 123, 250, 35);
@@ -177,10 +183,17 @@ public class MainFrame
 		{
 			@Override
 			public void focusGained(FocusEvent e) {
+				// reset colors for password
+				passwordField.setBorder(new MatteBorder(0, 5, 0, 0,
+						(Color) BACKGROUND_COLOR_DEFAULT));
+				passwordField.setBackground(BACKGROUND_COLOR_DEFAULT);
+
+				// clear connection message
+				lblConnectionMessage.setText("");
+
+				// clear password field
 				if (new String(passwordField.getPassword())
 						.equals(PASSWORD_MESSAGE)) {
-					passwordField.setBorder(new MatteBorder(0, 5, 0, 0,
-							(Color) new Color(102, 204, 255)));
 					passwordField.setText("");
 				} // end if
 			}
@@ -189,19 +202,42 @@ public class MainFrame
 			public void focusLost(FocusEvent e) {
 				if (new String(passwordField.getPassword()).equals("")) {
 					passwordField.setText(PASSWORD_MESSAGE);
+					passwordField.setBorder(new MatteBorder(0, 5, 0, 0,
+							(Color) BACKGROUND_COLOR_DEFAULT));
+					passwordField.setBackground(BACKGROUND_COLOR_DEFAULT);
+					passwordField.setFont(new Font("Open Sans", Font.PLAIN, 13));
+					passwordField.setForeground(FONT_COLOR_DEFAULT);
 				} // end if
 			}
 		});
 		passwordField.setFont(new Font("Open Sans", Font.BOLD, 13));
 
 		final JButton btnLogIn = new JButton("Sign In");
-		btnLogIn.setBounds(34, 183, 250, 40);
+		btnLogIn.setBounds(34, 198, 250, 40);
 		btnLogIn.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent arg0) {
 				String userName = txtUsername.getText();
-				db.userExists(userName, passwordField.getPassword());
-				System.out.println("User exists");
+				try {
+					db = new DB(userName, new String(passwordField.getPassword()));
+				} catch (SQLException e) {
+					// error messages
+					lblConnectionMessage.setToolTipText(e.getMessage());
+					lblConnectionMessage.setForeground(BACKGROUND_COLOR_ERROR);
+					lblConnectionMessage.setText("Error username/password");
+
+					// error colors of user name
+					txtUsername.setBorder(new MatteBorder(0, 5, 0, 0,
+							(Color) BACKGROUND_COLOR_ERROR));
+					txtUsername.setBackground(BACKGROUND_COLOR_ERROR);
+
+					// error colors for password
+					passwordField.setBorder(new MatteBorder(0, 5, 0, 0,
+							(Color) BACKGROUND_COLOR_ERROR));
+					passwordField.setBackground(BACKGROUND_COLOR_ERROR);
+					passwordField.setFont(new Font("Open Sans", Font.PLAIN, 13));
+					passwordField.setForeground(FONT_COLOR_DEFAULT);
+				}
 			} // end method actionPerformed
 		});
 		btnLogIn.setIcon(new ImageIcon(MainFrame.class
@@ -211,6 +247,16 @@ public class MainFrame
 		panelBackgroundFront.add(lblLogin);
 		panelBackgroundFront.add(passwordField);
 		panelBackgroundFront.add(btnLogIn);
+
+		lblConnectionMessage = new JLabel("");
+		lblConnectionMessage.setBounds(34, 166, 250, 18);
+		panelBackgroundFront.add(lblConnectionMessage);
+
+		JLabel lblBackgroundFront = new JLabel("Front Background");
+		lblBackgroundFront.setHorizontalAlignment(SwingConstants.CENTER);
+		lblBackgroundFront.setBounds(0, 0, 314, 277);
+		lblBackgroundFront.setIcon(new ImageIcon(MainFrame.class
+				.getResource("/img/background_small.png")));
 		panelBackgroundFront.add(lblBackgroundFront);
 
 		JLabel lblBackground = new JLabel("background");
