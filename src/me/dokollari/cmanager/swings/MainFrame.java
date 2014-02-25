@@ -164,8 +164,8 @@ public class MainFrame
 		txtUsername.setColumns(10);
 
 		final JLabel lblLogin = new JLabel(LOG_IN_MESSAGE_JLABEL);
-		lblLogin.setBounds(34, 47, 250, 14);
-		lblLogin.setFont(new Font("Open Sans", Font.PLAIN, 11));
+		lblLogin.setBounds(34, 43, 250, 18);
+		lblLogin.setFont(new Font("Open Sans", Font.BOLD, 13));
 		lblLogin.setForeground(new Color(51, 51, 51));
 
 		passwordField = new JPasswordField();
