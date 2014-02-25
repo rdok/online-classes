@@ -86,7 +86,7 @@ public class MainFrame
 
 				for (int i = 0; i < panelBackground.getComponentCount() - 1; i++) {
 					Component component = panelBackground.getComponent(i);
-					component.setLocation(panelBackground.getWidth() / 3,
+					component.setLocation((int) (panelBackground.getWidth() / 2 - component.getSize().getWidth()/2),
 							component.getY());
 				}
 
