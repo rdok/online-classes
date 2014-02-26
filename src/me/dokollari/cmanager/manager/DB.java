@@ -7,16 +7,24 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
+/**
+ * @author Rizart Dokollari
+ * @version 1.7
+ * @since February, 2014
+ * 
+ */
 public class DB
 {
-	private final String DB_CONNECTION = "jdbc:mysql://127.0.0.1:3306/classesonline";
+	private static final String REGEX_USER_NAME = "[a-zA-Z0-9_]{3,45}";
+	private static final String REGEX_PASSWORD = "[a-zA-Z0-9!@#$%^&*()+=._]{8,45}";
+	private final String DB_CONNECTION = "jdbc:mysql://localhost:3306/classesonline";
 	private String db_user;
 	private String db_password;
 	private Connection connection;
 
-	public DB(String db_user, String db_password) throws SQLException {
-		this.db_user = db_user;
-		this.db_password = db_password;
+	public DB(String db_user, String db_password) throws Exception {
+		setDb_user(db_user);
+		setDb_password(db_password);
 		connection = getDBConnection();
 	}
 
@@ -56,5 +64,22 @@ public class DB
 		connectionProps.put("password", db_password);
 		connection = DriverManager.getConnection(DB_CONNECTION, connectionProps);
 		return connection;
+	} // end method getDBConnection
+
+	public void setDb_user(String db_user) throws CManagerException {
+		if (!db_user.matches(REGEX_USER_NAME)) {
+			throw new CManagerException("Username can contain only: "
+					+ REGEX_USER_NAME);
+		} // end if
+		this.db_user = db_user;
 	}
+
+	public void setDb_password(String db_password) throws CManagerException {
+		if (!db_password.matches(REGEX_PASSWORD)) {
+			throw new CManagerException("Password can contain only: "
+					+ REGEX_USER_NAME);
+		} // end if
+		this.db_password = db_password;
+	}
+
 }

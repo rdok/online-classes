@@ -13,6 +13,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.sql.SQLException;
 
 import javax.swing.ImageIcon;
@@ -27,21 +29,19 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.border.TitledBorder;
 
 import me.dokollari.cmanager.manager.DB;
 
 /**
- * 
- * @author Riz
+ * @author Rizart Dokollari
+ * @version 1.7
+ * @since February, 2014
  * 
  */
 public class MainFrame
 {
 
+	private static final Color BACKGROUND_COLOR_SUCCESS = new Color(50, 205, 50);
 	private static final Color FONT_COLOR_DEFAULT = new Color(51, 51, 51);
 	private static final Color BACKGROUND_COLOR_DEFAULT = new Color(255, 255,
 			255);
@@ -122,6 +122,15 @@ public class MainFrame
 		panelBackgroundBack.add(panelBackgroundFront);
 
 		txtUsername = new JTextField();
+		txtUsername.addKeyListener(new KeyAdapter()
+		{
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
+					logInAction();
+				} // end if
+			}
+		});
 		txtUsername.setBounds(34, 72, 250, 35);
 		txtUsername.setBorder(new MatteBorder(0, 5, 0, 0, (Color) null));
 		txtUsername.setCaretColor(new Color(0, 153, 255));
@@ -170,11 +179,22 @@ public class MainFrame
 		txtUsername.setColumns(10);
 
 		final JLabel lblLogin = new JLabel(LOG_IN_MESSAGE_JLABEL);
-		lblLogin.setBounds(34, 43, 46, 18);
+		lblLogin.setFocusable(false);
+		lblLogin.setVerticalAlignment(SwingConstants.BOTTOM);
+		lblLogin.setBounds(34, 43, 50, 18);
 		lblLogin.setFont(new Font("Open Sans", Font.BOLD, 13));
 		lblLogin.setForeground(FONT_COLOR_DEFAULT);
 
 		passwordField = new JPasswordField();
+		passwordField.addKeyListener(new KeyAdapter()
+		{
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					logInAction();
+				} // end if
+			}
+		});
 		passwordField.setBounds(34, 123, 250, 35);
 		passwordField.setCaretColor(new Color(0, 153, 255));
 		passwordField.setToolTipText("Your password.");
@@ -200,6 +220,8 @@ public class MainFrame
 
 			@Override
 			public void focusLost(FocusEvent e) {
+
+				// reset password indication
 				if (new String(passwordField.getPassword()).equals("")) {
 					passwordField.setText(PASSWORD_MESSAGE);
 					passwordField.setBorder(new MatteBorder(0, 5, 0, 0,
@@ -217,27 +239,7 @@ public class MainFrame
 		btnLogIn.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent arg0) {
-				String userName = txtUsername.getText();
-				try {
-					db = new DB(userName, new String(passwordField.getPassword()));
-				} catch (SQLException e) {
-					// error messages
-					lblConnectionMessage.setToolTipText(e.getMessage());
-					lblConnectionMessage.setForeground(BACKGROUND_COLOR_ERROR);
-					lblConnectionMessage.setText("Error username/password");
-
-					// error colors of user name
-					txtUsername.setBorder(new MatteBorder(0, 5, 0, 0,
-							(Color) BACKGROUND_COLOR_ERROR));
-					txtUsername.setBackground(BACKGROUND_COLOR_ERROR);
-
-					// error colors for password
-					passwordField.setBorder(new MatteBorder(0, 5, 0, 0,
-							(Color) BACKGROUND_COLOR_ERROR));
-					passwordField.setBackground(BACKGROUND_COLOR_ERROR);
-					passwordField.setFont(new Font("Open Sans", Font.PLAIN, 13));
-					passwordField.setForeground(FONT_COLOR_DEFAULT);
-				}
+				logInAction();
 			} // end method actionPerformed
 		});
 		btnLogIn.setIcon(new ImageIcon(MainFrame.class
@@ -249,10 +251,19 @@ public class MainFrame
 		panelBackgroundFront.add(btnLogIn);
 
 		lblConnectionMessage = new JLabel("");
+		lblConnectionMessage.setFocusable(false);
 		lblConnectionMessage.setBounds(34, 166, 250, 18);
 		panelBackgroundFront.add(lblConnectionMessage);
 
+		JLabel lblDemoUser = new JLabel("demo_user/demo_password");
+		lblDemoUser.setFocusable(false);
+		lblDemoUser.setForeground(Color.GRAY);
+		lblDemoUser.setFont(new Font("Tahoma", Font.ITALIC, 11));
+		lblDemoUser.setBounds(94, 43, 146, 18);
+		panelBackgroundFront.add(lblDemoUser);
+
 		JLabel lblBackgroundFront = new JLabel("Front Background");
+		lblBackgroundFront.setFocusable(false);
 		lblBackgroundFront.setHorizontalAlignment(SwingConstants.CENTER);
 		lblBackgroundFront.setBounds(0, 0, 314, 277);
 		lblBackgroundFront.setIcon(new ImageIcon(MainFrame.class
@@ -277,4 +288,57 @@ public class MainFrame
 			}
 		});
 	}
-}
+
+	/**
+	 * - called when user presses log in button / enter keyboard button
+	 * 
+	 * - app tries to connection to database. if connection is achieved it stores
+	 * the given user_name & password; these credentials will be used for the
+	 * rest of the app
+	 * 
+	 * - if any error is found then the app uses colors & message to indicate the
+	 * user what did he do wrong
+	 */
+	private void logInAction() {
+		String userName = txtUsername.getText();
+		try {
+
+			db = new DB(userName, new String(passwordField.getPassword()));
+
+			// connection successfully at this point - no exception
+			txtUsername.setBackground(BACKGROUND_COLOR_SUCCESS);
+			txtUsername.setBorder(new MatteBorder(0, 5, 0, 0,
+					(Color) BACKGROUND_COLOR_SUCCESS));
+			passwordField.setBorder(new MatteBorder(0, 5, 0, 0,
+					(Color) BACKGROUND_COLOR_SUCCESS));
+			passwordField.setBackground(BACKGROUND_COLOR_SUCCESS);
+
+			lblConnectionMessage.setForeground(Color.GREEN);
+			lblConnectionMessage.setText("Connection established.");
+
+		} catch (SQLException e) {
+			// error messages
+			lblConnectionMessage.setForeground(BACKGROUND_COLOR_ERROR);
+			lblConnectionMessage.setToolTipText(e.getMessage());
+			lblConnectionMessage.setText("Error username/password");
+
+			// error colors of user name
+			txtUsername.setBorder(new MatteBorder(0, 5, 0, 0,
+					(Color) BACKGROUND_COLOR_ERROR));
+			txtUsername.setBackground(BACKGROUND_COLOR_ERROR);
+
+			// error colors for password
+			passwordField.setBorder(new MatteBorder(0, 5, 0, 0,
+					(Color) BACKGROUND_COLOR_ERROR));
+			passwordField.setBackground(BACKGROUND_COLOR_ERROR);
+			passwordField.setFont(new Font("Open Sans", Font.PLAIN, 13));
+			passwordField.setForeground(FONT_COLOR_DEFAULT);
+		} catch (Exception e) {
+			lblConnectionMessage.setForeground(BACKGROUND_COLOR_ERROR);
+			lblConnectionMessage.setText("Credentials Error. Hover for details.");
+			lblConnectionMessage.setToolTipText(e.getMessage());
+
+		} 
+	} // end method logInAction
+} // end class MainFrame
+
