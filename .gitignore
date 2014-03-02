@@ -3,6 +3,5 @@
 # Package Files #
 *.jar
 !/lib/ex_lib/*
-!/deploy/*
 *.war
 *.ear
